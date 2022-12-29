@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+  <div class="container">
+    <h1 class="mt-4">Création d'un ingradient</h1>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success d-flex justify-content-center">
+            {{ message }}
+        </div>
+    {% endfor %}
+{#    
+    {{ form(form) }} #}
+
+    {{ form_start(form) }}
+
+
+    <div class="form-group">
+        {{ form_label(form.name) }}
+        {{ form_widget(form.name) }}
+        <div class="form-error">
+            {{ form_errors(form.name) }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.price) }}
+        {{ form_widget(form.price) }}
+        <div class="form-error">
+            {{ form_errors(form.price) }}
+        </div>
+        
+    </div>
+
+
+    <div class="form-group">
+        {{ form_row(form.submit) }}
+    </div>
+
+    {# <div class="row">
+      <div class="col">{{ form_row(form.name) }}</div>
+      <div class="col" id="some-custom-id">{{ form_row(form.price) }}</div>
+    </div> #}
+
+
+    {# <div class="form-group">
+      {{ form_label(form.name)}}
+      <label for="exampleInputEmail1" class="form-label mt-4">Email address</label>
+      <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+      <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+    </div> #}
+
+
+
+    {{ form_end(form) }}
+
+
+  </div>
+{% endblock %}
