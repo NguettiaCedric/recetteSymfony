@@ -7,6 +7,7 @@ use App\Form\UserPasswordType;
 use App\Form\UserType;
 use Doctrine\Migrations\Configuration\EntityManager\ManagerRegistryEntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,30 +19,34 @@ class UserController extends AbstractController
     /**
      * Edition du profile de l'utilsateur
      */
+    #[Security("is_granted('ROLE_USER') and user === userConnect")]
     #[Route('/utilisateur/edition/{id}', name: 'user.edit', methods:['GET', 'POST'])]
-    public function index(User $user, Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $hasher): Response
+    public function index(User $userConnect, Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $hasher): Response
     {     
         //Verification de l'utilisateur avant la modification
         // $this->getUser() recupreation de l'utilisateur connecté
         // dd($user);
-        if (!$this->getUser()) {
+
+        
+        /* if (!$this->getUser()) {
             return $this->redirectToRoute('security.login');
         }  
-
         // dd($user, $this->getUser());
         
         //On verifier si l'utilisateur connecté est identique à celui en cour {id}
         if($this->getUser() !== $user){
             return $this->redirectToRoute('recipe.index');
-        }
+        } */
 
-        $form = $this->createForm(UserType::class, $user);
+
+
+        $form = $this->createForm(UserType::class, $userConnect);
         
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
             //On vérifie ici si le mot de passe entré est il identique à celle de la dd
-            if ($hasher->isPasswordValid($user, $form->getData()->getPlainPassword())) {
+            if ($hasher->isPasswordValid($userConnect, $form->getData()->getPlainPassword())) {
                 $user = $form->getData();
                 $manager->persist($user);
                 $manager->flush();
@@ -67,8 +72,10 @@ class UserController extends AbstractController
         ]);
     }
 
+
+    #[Security("is_granted('ROLE_USER') and user === userConnect")]
     #[Route('/utilisateur/edition-mot-de-passe/{id}', 'user.edit.password', methods:['GET', 'POST'])]
-    public function editPassword(User $user, Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $hasher)
+    public function editPassword(User $userConnect, Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $hasher)
     {      
         $form = $this->createForm(UserPasswordType::class);
 
@@ -76,11 +83,11 @@ class UserController extends AbstractController
         // dd($form->getData());
         if ($form->isSubmitted() && $form->isValid()){
            
-            if ($hasher->isPasswordValid($user, $form->getData()['plainPassword'])) {
-                $user->setPassword(
+            if ($hasher->isPasswordValid($userConnect, $form->getData()['plainPassword'])) {
+                $userConnect->setPassword(
                     // $form->getData()['newPassword']
                     $hasher->hashPassword(
-                        $user,
+                        $userConnect,
                         $form->getData()['newPassword']
                     )
                 );
@@ -90,7 +97,7 @@ class UserController extends AbstractController
                 //     $form->getData()['newPassword']
                 // );
 
-                $manager->persist($user);
+                $manager->persist($userConnect);
                 $manager->flush();
 
                 $this->addFlash(
