@@ -15,7 +15,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RecipeController extends AbstractController
-{
+{   
+
+    /**
+     * Fonction index
+     */
     #[Route('/recette', name: 'recipe.index', methods:['GET'])]
     #[IsGranted('ROLE_USER')]
     public function index(RecipeRepository $repository, PaginatorInterface $paginator, Request $request): Response
@@ -31,6 +35,22 @@ class RecipeController extends AbstractController
             'recipes' => $recipes,
         ]);
     }
+
+
+    /**
+     * LA function show
+    */
+    // #[Security("is_granted('ROLE_USER') and recipe.isPublic === true")]
+    #[Security("is_granted('ROLE_USER') and recipe.getIsPublic() === true")]
+    #[Route('/recette/{id}', 'recipe.Show', methods: ['GET'])]
+    public function show(Recipe $recipe) : Response
+    {   
+        // dd($recipe);
+        return $this->render('pages/recipe/show.html.twig', [
+            'recipe' => $recipe,
+        ]);
+    }
+
 
      /**
      * Store d'un recipe
@@ -69,6 +89,7 @@ class RecipeController extends AbstractController
          return $this->render('pages/recipe/new.html.twig', [
              'form' => $form->createView()
          ]);
+
      }
 
     /**

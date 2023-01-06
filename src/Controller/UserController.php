@@ -45,7 +45,7 @@ class UserController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
-            //On vérifie ici si le mot de passe entré est il identique à celle de la dd
+            //On vérifie ici si le mot de passe entré est il identique à celle de la BD
             if ($hasher->isPasswordValid($userConnect, $form->getData()->getPlainPassword())) {
                 $user = $form->getData();
                 $manager->persist($user);
